@@ -23,7 +23,7 @@ task_name=svhn
 # 500: 97.73 +- 0.09
 # 250: 97.28 +- 0.40
 
-for sup_size in 4000 2000 1000 500 250;
+for sup_size in 250 1000;
 do
   python main.py \
     --use_tpu=False \
@@ -38,5 +38,7 @@ do
     --train_steps=500000 \
     --uda_confidence_thresh=0.8 \
     --uda_softmax_temp=0.4 \
+    --ns3l_coeff=0.3 \
+    --ns3l_threshold=0.04 \
     $@
 done
