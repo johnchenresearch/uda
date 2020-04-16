@@ -23,7 +23,7 @@ task_name=cifar10
 # 500: 95.20 +- 0.09
 # 250: 94.57 +- 0.96
 
-for sup_size in 4000 2000 1000 500 250;
+for sup_size in 250 4000;
 do
   python main.py \
     --use_tpu=False \
@@ -38,5 +38,7 @@ do
     --train_steps=500000 \
     --uda_confidence_thresh=0.8 \
     --uda_softmax_temp=0.4 \
+    --ns3l_threshold=0.04 \
+    --ns3l_coeff=0.3 \
     $@
 done
