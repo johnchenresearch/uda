@@ -389,14 +389,17 @@ def get_model_fn(hparams):
         
       if FLAGS.ns3l_coeff > 0:
         ns3l_coeff = FLAGS.ns3l_coeff
-        metric_dict["unsup/ns3l_coeff"] = ns3l_coeff
+        #metric_dict["unsup/ns3l_coeff"] = ns3l_coeff
         ori_prob = tf.nn.softmax(ori_logits, axis=-1)
         aug_prob = tf.nn.softmax(aug_logits, axis=-1)
-        ori_prob_mask = tf.stop_gradient(tf.nn.softmax(ori_logits, axis=-1) < FLAGS.ns3l_threshold)
-        aug_prob_mask = tf.stop_gradient(tf.nn.softmax(aug_logits, axis=-1) < FLAGS.ns3l_threshold)
+        ori_prob_mask = tf.cast(tf.less(tf.nn.softmax(ori_logits, axis=-1), FLAGS.ns3l_threshold), tf.float32)
+        aug_prob_mask = tf.cast(tf.less(tf.nn.softmax(aug_logits, axis=-1), FLAGS.ns3l_threshold), tf.float32)
+        ori_prob_mask = tf.stop_gradient(ori_prob_mask)
+        aug_prob_mask = tf.stop_gradient(aug_prob_mask)
         ns3l_ori_loss = tf.reduce_mean(tf.log(1 - tf.reduce_sum(ori_prob * ori_prob_mask, axis=-1)))
         ns3l_aug_loss = tf.reduce_mean(tf.log(1 - tf.reduce_sum(aug_prob * aug_prob_mask, axis=-1)))
         total_loss = total_loss + ns3l_coeff * (ns3l_ori_loss + ns3l_aug_loss)
+
 
       avg_unsup_loss = tf.reduce_mean(aug_loss)
       total_loss += FLAGS.unsup_coeff * avg_unsup_loss
